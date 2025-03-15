@@ -2,35 +2,98 @@ import React, { useEffect, useState } from "react";
 
 const MyProfile = () => {
   // Dummy user data (replace with actual data fetching logic)
-  const [userdata, setUserdata] = useState({
-    UserAlias: "John Doe",
-    UserGender: "Male",
-    UserEmail: "johndoe@example.com",
-    UserPhone: "+1234567890",
-    UserAddress: "123 Main St, City, Country",
-    UserZone: "Zone A",
-    UserImg: "https://via.placeholder.com/150", // Placeholder image URL
-    UserCellGroups: [{ SmallGroupName: "Young Adults" }],
-    UserMinistries: [
-      { MinistryName: "Worship Ministry" },
-      { MinistryName: "Outreach Ministry" },
-    ],
-    UserNok: "Jane Doe",
-    UserNokPhone: "+0987654321",
-    UserNokRel: "Spouse",
-    UserMariral: "Married",
-    UserSpouse: "Jane Doe",
-    UserSpousePhone: "+0987654321",
+  const [userdata, setUserdata] = React.useState({
+    Tkn: "",
+    UserID: "",
+    UserAlias: "",
+    UserGender: "",
+    UserEmail: "",
+    UserPhone: "",
+    UserAddress: "",
+    UserNok: "",
+    UserNokPhone: "",
+    UserNokRel: "",
+    UserMariral: "",
+    UserSpouse: "",
+    UserSpousePhone: "",
+    UserZone: "",
+    UserImg: "",
+    UserMinistries: [],
+    UserCellGroups: [],
   });
+
 
   // Fetch user data (replace with your actual data fetching logic)
   useEffect(() => {
-    // Simulate fetching user data from an API or local storage
-    const fetchUserData = async () => {
-      // Add your data fetching logic here
-      console.log("Fetching user data...");
+    const asyncFetch = async () => {
+      const Tkn = localStorage.getItem("Tkn");
+      const UserID = localStorage.getItem("UserID");
+      const UserAlias = localStorage.getItem("UserAlias");
+      const UserGender = localStorage.getItem("UserGender");
+      const UserEmail = localStorage.getItem("UserEmail");
+      const UserPhone = localStorage.getItem("UserPhone");
+      const UserAddress = localStorage.getItem("UserAddress");
+      const UserZone = localStorage.getItem("UserZone");
+      const UserImg = localStorage.getItem("UserImg");
+      const UserNok = localStorage.getItem("UserNok");
+      const UserNokPhone = localStorage.getItem("UserNokPhone");
+      const UserNokRel = localStorage.getItem("UserNokRel");
+      const UserMariral = localStorage.getItem("UserMarital");
+      const UserSpouse = localStorage.getItem("UserSpouse");
+      const UserSpousePhone = localStorage.getItem("UserSpousePhone");
+      let UserMinistries = [];
+      let UserCellGroups = [];
+      try {
+        let value = localStorage.getItem("UserMinistries");
+        if (value != null) {
+          // do something
+          const AsyncUserMinistries = localStorage.getItem(
+            "UserMinistries"
+          );
+          UserMinistries = JSON.parse(AsyncUserMinistries);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      try {
+        let value = localStorage.getItem("UserCellGroups");
+        if (value != null) {
+          // do something
+          const AsyncUserCellGroups = localStorage.getItem(
+            "UserCellGroups"
+          );
+          UserCellGroups = JSON.parse(AsyncUserCellGroups);
+        } else {
+          UserCellGroups = [];
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
+      if (UserID) {
+        setUserdata({
+          Tkn,
+          UserID,
+          UserAlias,
+          UserGender,
+          UserEmail,
+          UserPhone,
+          UserAddress,
+          UserZone,
+          UserImg,
+          UserNok,
+          UserNokPhone,
+          UserNokRel,
+          UserMariral,
+          UserSpouse,
+          UserSpousePhone,
+          UserMinistries,
+          UserCellGroups,
+        });
+        console.log("Set done");
+      }
     };
-    fetchUserData();
+    asyncFetch();
   }, []);
 
   return (
@@ -155,6 +218,7 @@ const styles = {
     padding: "20px",
     background: "linear-gradient(180deg, #30303030, #ffffff, #30303050)",
     minHeight: "100vh",
+    marginBottom: "60px",
   },
   header: {
     textAlign: "center",

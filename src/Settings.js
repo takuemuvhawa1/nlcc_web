@@ -1,16 +1,26 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2";
+import { API_URL } from "./config";
+import axios from 'axios';
 
 const Settings = () => {
   // State for password inputs
+  const [file, setFile] = useState();
   const [hidePin, setHidePin] = useState(true);
   const [hideNewPin, setHideNewPin] = useState(true);
   const [hideConfirmNewPin, setHideConfirmNewPin] = useState(true);
+
   const [inputs, setInputs] = useState({
     email: "",
     oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
   });
+
+  function handleChange(e) {
+    console.log(e.target.files);
+    setFile(e.target.files[0]);
+  }
 
   // State for next of kin and marital status
   const [nok, setNok] = useState({
@@ -44,32 +54,106 @@ const Settings = () => {
   };
 
   // Handle password change
-  const handlePasswordChange = () => {
-    if (!inputs.email || !inputs.oldPassword || !inputs.newPassword || !inputs.confirmNewPassword) {
-      alert("Please fill in all fields.");
+  const handlePasswordChange = async () => {
+    if (
+      !inputs.email ||
+      !inputs.oldPassword ||
+      !inputs.newPassword ||
+      !inputs.confirmNewPassword
+    ) {
+      Swal.fire({
+        text: "Submission Error. Fill all the fields before proceeding",
+        icon: "error",
+      });
       return;
     }
     if (inputs.newPassword !== inputs.confirmNewPassword) {
-      alert("New passwords do not match.");
+      Swal.fire({
+        text: "Submission Error. Password confirmation is wrong",
+        icon: "error",
+      });
       return;
     }
+
+    const obj = {
+      email: inputs.email,
+      oldPassword: inputs.oldPassword,
+      newPassword: inputs.newPassword,
+    }
+
     setIsLoadingPassword(true);
-    // Simulate API call
-    setTimeout(() => {
+    let signinresponse = await fetch(`${API_URL}/onboarding/resetpassword`, {
+      method: "post",
+      body: JSON.stringify(obj),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    let resJson = await signinresponse.text();
+
+    console.log(resJson);
+
+    if (resJson.message == "Invalid email or password") {
+      Swal.fire({
+        text: "Submission Error. The sent email or phone is invalid",
+        icon: "error",
+      });
       setIsLoadingPassword(false);
-      alert("Password updated successfully.");
-      setInputs({ email: "", oldPassword: "", newPassword: "", confirmNewPassword: "" });
-    }, 2000);
+      return;
+    }
+
+    if (resJson.message == "Password reset successfully") {
+      setInputs({
+        email: "",
+        oldPassword: "",
+        newPassword: "",
+        cnnewPassword: "",
+      });
+      setIsLoadingPassword(false);
+      Swal.fire({
+        text: "Saving successfull",
+        icon: "success",
+      });
+    }
   };
 
   // Handle preferred communication update
-  const handleCommunicationUpdate = () => {
+  const handleCommunicationUpdate = async () => {
+
+    const userId = localStorage.getItem("UserID");
     setIsLoadingCommunication(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoadingCommunication(false);
-      alert("Preferred communication updated successfully.");
-    }, 2000);
+
+    let signinresponse = await fetch(
+      `${API_URL}/members/preferred/comm/${userId}`,
+      {
+        method: "put",
+        body: JSON.stringify({
+          email: isMailSelected,
+          phone: isPhoneSelected,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    let resJson = await signinresponse.json();
+
+    console.log(resJson);
+    setIsLoadingCommunication(false);
+
+    if (resJson.message == "Member details updated successfully") {
+      Swal.fire({
+        text: "Member details updated successfully",
+        icon: "success",
+      });
+    } else {
+      Swal.fire({
+        text: "Member details did not update successfully. Contact sysem admin",
+        icon: "error",
+      });
+    }
   };
 
   // Handle next of kin and marital status update
@@ -96,6 +180,51 @@ const Settings = () => {
     }
   };
 
+  const handleImgUpload = async () => {
+    if (file == "") {
+      Swal.fire({
+        text: "Submission Error. Select the image first before proceeding",
+        icon: "error",
+      });
+      return;
+    }
+
+    const UserID = localStorage.getItem("UserID");
+    setIsImageUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    await axios
+      .post(`${API_URL}/upload/${UserID}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      .then((response) => {
+        console.log("Pik" + response.data.Filename);
+
+        if (response.data.result.message == "Member updated successfully") {
+          const setnewimg = async () => {
+           localStorage.setItem("UserImg", response.data.Filename);
+          };
+          setnewimg();
+          setFile("");
+          setIsImageUploading(false);
+          localStorage.setItem("UserImg", response.data.Filename);
+          Swal.fire({
+            text: "Successfull. Image uploaded successfully",
+            icon: "success",
+          });
+          return;
+        }
+      })
+      .catch((error) => {
+        setIsImageUploading(false);
+        console.log(error.response.data.message);
+      });
+  };
+
   return (
     <div style={styles.container}>
       <h1 style={styles.header}>Settings</h1>
@@ -103,22 +232,22 @@ const Settings = () => {
       {/* Profile Picture Section */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>Change Profile Picture</h2>
-        <div style={styles.profileImageContainer}>
-          {profileImage ? (
-            <img src={profileImage} alt="Profile" style={styles.profileImage} />
+        <div
+          onClick={() => document.getElementById("fileInput").click()}
+          style={styles.profileImageContainer}
+        >
+          {file ? (
+            <>
+              <img src={URL.createObjectURL(file)} style={styles.profileImage} />
+            </>
           ) : (
             <div style={styles.profileImagePlaceholder}>Profile Image</div>
           )}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            style={styles.fileInput}
-          />
+          <input id="fileInput" type="file" onChange={handleChange} hidden />
         </div>
         <button
           style={styles.button}
-          onClick={() => document.getElementById("fileInput").click()}
+          onClick={() => handleImgUpload()}
           disabled={isImageUploading}
         >
           {isImageUploading ? "Uploading..." : "Upload New Image"}
@@ -130,7 +259,7 @@ const Settings = () => {
         <h2 style={styles.sectionTitle}>Change Password</h2>
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Email or phone"
           value={inputs.email}
           onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
           style={styles.input}
@@ -140,7 +269,9 @@ const Settings = () => {
             type={hidePin ? "password" : "text"}
             placeholder="Current Password"
             value={inputs.oldPassword}
-            onChange={(e) => setInputs({ ...inputs, oldPassword: e.target.value })}
+            onChange={(e) =>
+              setInputs({ ...inputs, oldPassword: e.target.value })
+            }
             style={styles.input}
           />
           <span
@@ -155,7 +286,9 @@ const Settings = () => {
             type={hideNewPin ? "password" : "text"}
             placeholder="New Password"
             value={inputs.newPassword}
-            onChange={(e) => setInputs({ ...inputs, newPassword: e.target.value })}
+            onChange={(e) =>
+              setInputs({ ...inputs, newPassword: e.target.value })
+            }
             style={styles.input}
           />
           <span
@@ -170,7 +303,9 @@ const Settings = () => {
             type={hideConfirmNewPin ? "password" : "text"}
             placeholder="Confirm New Password"
             value={inputs.confirmNewPassword}
-            onChange={(e) => setInputs({ ...inputs, confirmNewPassword: e.target.value })}
+            onChange={(e) =>
+              setInputs({ ...inputs, confirmNewPassword: e.target.value })
+            }
             style={styles.input}
           />
           <span
@@ -303,6 +438,7 @@ const styles = {
     padding: "20px",
     maxWidth: "500px",
     margin: "0 auto",
+    marginBottom: "60px",
   },
   header: {
     fontSize: "24px",
