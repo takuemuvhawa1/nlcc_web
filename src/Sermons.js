@@ -31,7 +31,7 @@ const Sermons = () => {
     );
 
     return (
-        <div>
+        <div style={styles.container}>
             <h4 style={{ textAlign: 'center', fontSize: '17px', color: '#1a6363' }}>
                 Sermons
             </h4>
@@ -49,17 +49,18 @@ const Sermons = () => {
                         borderRadius: '5px',
                         border: '1px solid #1a6363',
                         fontSize: '14px',
+                        width: '344px'
                     }}
                 />
             </div>
             {/* List of Sermons */}
-            <div style={{ margin: '0 auto', maxWidth: '500px' }}>
+            <div style={{ margin: '0 auto', maxWidth: '500px', width: '100%' }}>
                 {filteredSermons.map((sermon) => (
                     <div
                         key={sermon.id}
                         style={{
                             border: '1px solid #1a6363',
-                            borderRadius: '10px',
+                            borderRadius: '5px',
                             padding: '15px',
                             margin: '10px 0',
                             backgroundColor: '#f9f9f9',
@@ -94,6 +95,20 @@ const Sermons = () => {
             </div>
         </div>
     );
+};
+
+// Styles
+const styles = {
+    container: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "20px",
+        width: '100%'
+        // // backgroundColor: "#f5f5f5",
+        // backgroundColor: "#fff",
+        // minHeight: "100vh",
+    },
 };
 
 export default Sermons;

@@ -7,13 +7,14 @@ const PrayerReq = () => {
     const [prayerRequest, setPrayerRequest] = useState("");
     const [showSentRequests, setShowSentRequests] = useState(false);
     const [sentRequests, setSentRequests] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const asyncFetch = async () => {
             try {
-                // const userId = await localStorage.getItem("UserID");
+                const userId = localStorage.getItem("UserID");
 
-                let res = await fetch(`${API_URL}/prayer-req/${3}`, {
+                let res = await fetch(`${API_URL}/prayer-req/${userId}`, {
                     method: "get",
                     headers: {
                         "Content-Type": "application/json",
@@ -36,19 +37,52 @@ const PrayerReq = () => {
 
     }, []);
 
-    const handleSendPrayerRequest = () => {
-        if (prayerRequest.trim() === "") {
-            alert("Please enter a prayer request.");
+    const handleSendPrayerRequest = async () => {
+        if (prayerRequest == "") {
+            Swal.fire({
+              text: "Sending failed. Type in the prayer request first",
+              icon: "error",
+            });
             return;
-        }
-        const newRequest = {
-            id: sentRequests.length + 1,
-            request: prayerRequest,
-            date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
-        };
-        setSentRequests([...sentRequests, newRequest]);
-        setPrayerRequest("");
-        alert("Prayer request sent successfully!");
+          }
+        try {
+            const userId = localStorage.getItem("UserID");
+            setIsLoading(true);
+            const response = await fetch(`${API_URL}/prayer-req`, {
+              method: "post",
+              body: JSON.stringify({
+                MemberID: userId,
+                requestnotes: prayerRequest,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+    
+            let resJson = await response.json();
+            setIsLoading(false);
+    
+            console.log(resJson);
+    
+            if (resJson.message == "Prayer request added successfully") {
+              setPrayerRequest("");
+              Swal.fire({
+                text: "Prayer request sent successfully",
+                icon: "success",
+              });
+            } else {
+              Swal.fire({
+                text: "Failed to send. Contact system admin!",
+                icon: "error",
+              });
+            }
+          } catch (error) {
+            console.error("Error sending request:", error);
+            Swal.fire({
+              text: "Failed to send. Check your internet connection!",
+              icon: "error",
+            });
+          }
     };
 
     const toggleView = () => {
@@ -60,12 +94,12 @@ const PrayerReq = () => {
             <h4 style={{ textAlign: 'center', fontSize: '17px', color: '#1a6363' }}>
                 Prayer Requests
             </h4>
-            <div className="block" style={{ textAlign: 'left', justifyContent: 'left' }}>
+            <div className="block" style={{ textAlign: 'center', justifyContent: 'center' }}>
                 {/* <p style={{ textAlign: 'center', fontSize: '14px', color: '#555', marginBottom: '20px' }}>
                     "The Bible commands us to pray for one another, “Therefore, confess your sins to one another and pray for one another, that you may be healed. Again, prayer lightens burdens, therefore praying for one another is a powerful way for us to bear one another's burdens. It is a loving act to pray for someone."
                 </p> */}
 
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', width: '100%', marginTop: '20px' }}>
                     <button
                         style={{
                             padding: '10px 20px',
@@ -74,11 +108,11 @@ const PrayerReq = () => {
                             backgroundColor: showSentRequests ? '#fff' : '#1a6363',
                             color: showSentRequests ? '#1a6363' : '#fff',
                             cursor: 'pointer',
-                            marginRight: '10px',
+                            width: '140px'
                         }}
                         onClick={() => setShowSentRequests(false)}
                     >
-                        Send New Request
+                        Send New
                     </button>
                     <button
                         style={{
@@ -88,10 +122,11 @@ const PrayerReq = () => {
                             backgroundColor: showSentRequests ? '#1a6363' : '#fff',
                             color: showSentRequests ? '#fff' : '#1a6363',
                             cursor: 'pointer',
+                            width: '140px'
                         }}
                         onClick={() => setShowSentRequests(true)}
                     >
-                        View Sent Requests
+                        View Sent
                     </button>
                 </div>
 
@@ -122,13 +157,13 @@ const PrayerReq = () => {
                         ))}
                     </div>
                 ) : (
-                    <div style={{ textAlign: 'center' }}>
+                    <div style={{ textAlign: 'center', flexDirection: 'column', width: '100%' }}>
                         <textarea
                             value={prayerRequest}
                             onChange={(e) => setPrayerRequest(e.target.value)}
                             placeholder="Enter your prayer request..."
                             style={{
-                                width: '80%',
+                                width: '100%',
                                 height: '100px',
                                 padding: '10px',
                                 border: '1px solid #1a6363',
@@ -138,6 +173,7 @@ const PrayerReq = () => {
                             }}
                         />
                         <br />
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', width: '100%' }}>
                         <button
                             style={{
                                 padding: '10px 20px',
@@ -146,11 +182,15 @@ const PrayerReq = () => {
                                 backgroundColor: '#1a6363',
                                 color: '#fff',
                                 cursor: 'pointer',
+                                width: '145px',
+                                alignSelf: 'flex-end'
                             }}
-                            onClick={handleSendPrayerRequest}
+                            onClick={()=>handleSendPrayerRequest()}
                         >
                             Send
                         </button>
+
+                        </div>
                     </div>
                 )}
             </div>

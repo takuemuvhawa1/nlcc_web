@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from "./config";
 import Swal from "sweetalert2";
-import { BarLoader, ClipLoader } from "react-spinners";
+import { BarLoader } from "react-spinners";
 
 const ForgotPassword = () => {
     const navigate = useNavigate();
@@ -36,7 +36,7 @@ const ForgotPassword = () => {
                     localStorage.setItem("ForgotEmail", email);
                     localStorage.setItem("ForgotOTP", resJson.randNum.toString());
                     localStorage.setItem("ForgotName", resJson.member.Name +" "+resJson.member.Surname);
-                    navigate('/otp');
+                    navigate('/resetpassword');
                     return;
                 }else{
                     Swal.fire({

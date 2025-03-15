@@ -68,7 +68,7 @@ const Cellgroup = () => {
     };
 
     return (
-        <div>
+        <div style={{paddingInline: '10px'}}>
             <h4 style={{ textAlign: 'center', fontSize: '17px', color: '#1a6363' }}>
                 Cell Group Details
             </h4>

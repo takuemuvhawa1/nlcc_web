@@ -19,9 +19,10 @@ const Blank = () => {
             marginBottom: '10px',
             marginRight: '10px',
             width: '200px',
-            height: '35px',
+            height: '45px',
             border: '1px solid #000000',
             borderRadius: '10px',
+            borderWidth: '0px',
             backgroundColor: activeComponent === component ? '#1a6363' : '#B5D3CF',
             color: activeComponent === component ? '#ffffff' : '#000000',
         };
@@ -56,43 +57,41 @@ const Blank = () => {
 
                         <div
                             id="page-account"
-                            className="active"
                             style={{
-                                display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 flexDirection: 'column',
-                                // backgroundColor: 'tomato',
                                 width: '100%',
+                                paddingHorizontal: '20px'
                             }}
                         >
                             {activeComponent === "About" && (
-                                <div style={{ width: '90%' }}>
+                                <div style={{ width: '100%', alignSelf: 'center' }}>
                                     <About />
                                 </div>
                             )}
                             {activeComponent === "Ministries" && (
-                                <div style={{ width: '90%' }}>
+                                <div style={{ width: '100%', alignSelf: 'center'  }}>
                                     <Ministries />
                                 </div>
                             )}
                             {activeComponent === "Calender" && (
-                                <div style={{ width: '90%' }}>
+                                <div style={{ width: '100%' }}>
                                     <Calender />
                                 </div>
                             )}
                             {activeComponent === "Cellgroups" && (
-                                <div style={{ width: '90%' }}>
+                                <div style={{ width: '100%' }}>
                                     <Cellgroups />
                                 </div>
                             )}
                             {activeComponent === "PrayerReq" && (
-                                <div style={{ width: '90%' }}>
+                                <div style={{ width: '100%' }}>
                                     <PrayerReq />
                                 </div>
                             )}
                             {activeComponent === "Refresh" && (
-                                <div style={{ width: '90%' }}>
+                                <div style={{ width: '100%' }}>
                                     <Notifications />
                                 </div>
                             )}

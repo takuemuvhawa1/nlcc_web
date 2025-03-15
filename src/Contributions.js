@@ -66,7 +66,7 @@ const Contributions = () => {
           );
 
     return (
-        <div>
+        <div style={styles.container}>
             <h4 style={{ textAlign: 'center', fontSize: '17px', color: '#1a6363' }}>
                 Contributions
             </h4>
@@ -82,6 +82,7 @@ const Contributions = () => {
                         padding: '10px 20px',
                         cursor: 'pointer',
                         fontSize: '14px',
+                        width: '344px'
                     }}
                 >
                     {showCashContributions ? "Switch to Non-Cash Contributions" : "Switch to Cash Contributions"}
@@ -101,21 +102,22 @@ const Contributions = () => {
                         borderRadius: '5px',
                         border: '1px solid #1a6363',
                         fontSize: '14px',
+                        width: '344px'
                     }}
                 />
             </div>
             {/* List of Contributions */}
-            <div style={{ margin: '0 auto', maxWidth: '500px' }}>
+            <div style={{ margin: '0 auto', maxWidth: '500px', width: '100%' }}>
                 {filteredContributions.map((contribution) => (
                     <div
                         key={contribution.id}
                         style={{
                             border: '1px solid #1a6363',
-                            borderRadius: '10px',
+                            borderRadius: '5px',
                             padding: '15px',
                             margin: '10px 0',
                             backgroundColor: '#f9f9f9',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
                         }}
                     >
                         {showCashContributions ? (
@@ -148,6 +150,20 @@ const Contributions = () => {
             </div>
         </div>
     );
+};
+
+// Styles
+const styles = {
+    container: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "20px",
+        width: '100%'
+        // // backgroundColor: "#f5f5f5",
+        // backgroundColor: "#fff",
+        // minHeight: "100vh",
+    },
 };
 
 export default Contributions;

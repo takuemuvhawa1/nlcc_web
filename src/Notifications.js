@@ -39,7 +39,7 @@ const Notifications = () => {
             <h4 style={{ textAlign: 'center', fontSize: '17px', color: '#1a6363' }}>
                 Notifications
             </h4>
-            <div className="block" style={{ textAlign: 'left', justifyContent: 'left' }}>
+            <div className="block" style={{ textAlign: 'left', justifyContent: 'left',width: '100%' }}>
                 {notificationData.map((notification) => (
                     <div
                         key={notification.id}

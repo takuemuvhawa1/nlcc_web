@@ -20,7 +20,7 @@ const More = () => {
                     >
                         <div style={styles.cardContent}>
                             <span style={styles.cardText}>My Profile</span>
-                            <span style={styles.cardIcon}>👤</span>
+                            <span style={styles.cardIcon}><i className="material-icons" style={{ fontSize: '1.7rem', color: '#00000090' }}>person</i></span>
                         </div>
                     </div>
                 </NavLink>
@@ -33,7 +33,8 @@ const More = () => {
                     >
                         <div style={styles.cardContent}>
                             <span style={styles.cardText}>Profile Settings</span>
-                            <span style={styles.cardIcon}>⚙️</span>
+                            <span style={styles.cardIcon}><i className="material-icons" style={{ fontSize: '1.5rem', color: '#00000090' }}>settings</i></span>
+
                         </div>
                     </div>
                 </NavLink>
@@ -46,7 +47,8 @@ const More = () => {
                     >
                         <div style={styles.cardContent}>
                             <span style={styles.cardText}>Family Members (Kids)</span>
-                            <span style={styles.cardIcon}>👨‍👩‍👧‍👦</span>
+                            <span style={styles.cardIcon}><i className="material-icons" style={{ fontSize: '1.5rem', color: '#00000090' }}>groups</i></span>
+
                         </div>
                     </div>
                 </NavLink>
@@ -59,7 +61,7 @@ const More = () => {
                     >
                         <div style={styles.cardContent}>
                             <span style={styles.cardText}>About</span>
-                            <span style={styles.cardIcon}>ℹ️</span>
+                            <span style={styles.cardIcon}><i className="material-icons" style={{ fontSize: '1.5rem', color: '#00000090' }}>info</i></span>
                         </div>
                     </div>
                 </NavLink>
@@ -72,7 +74,8 @@ const More = () => {
                     >
                         <div style={styles.cardContent}>
                             <span style={styles.cardText}>Sign Out</span>
-                            <span style={styles.cardIcon}>🚪</span>
+                            <span style={styles.cardIcon}><i className="material-icons" style={{ fontSize: '1.5rem', color: '#00000090' }}>logout</i></span>
+
                         </div>
                     </div>
                 </NavLink>

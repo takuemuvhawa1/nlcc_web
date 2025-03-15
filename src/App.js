@@ -19,7 +19,7 @@ import Registerwith from './Registerwith';
 import ForgotPassword from './ForgotPassword';
 import EmailRegister from './EmailRegister';
 import PhoneRegister from './PhoneRegister';
-
+import ResetPassword from './ResetPassword';
 
 function App() {
 
@@ -30,6 +30,7 @@ function App() {
                     <Route path='/' element={<Login />}></Route>
                     <Route path='/registerselect' element={<Registerwith />}></Route>
                     <Route path='/forgotpassword' element={<ForgotPassword />}></Route>
+                    <Route path='/resetpassword' element={<ResetPassword />}></Route>
                     <Route path='/registeremail' element={<EmailRegister />}></Route>
                     <Route path='/registerphone' element={<PhoneRegister />}></Route>
                     <Route path='/register' element={<Register />}></Route>
