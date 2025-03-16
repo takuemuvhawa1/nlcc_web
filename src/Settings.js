@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { API_URL } from "./config";
-import axios from 'axios';
+import axios from "axios";
 
 const Settings = () => {
   // State for password inputs
@@ -79,7 +79,7 @@ const Settings = () => {
       email: inputs.email,
       oldPassword: inputs.oldPassword,
       newPassword: inputs.newPassword,
-    }
+    };
 
     setIsLoadingPassword(true);
     let signinresponse = await fetch(`${API_URL}/onboarding/resetpassword`, {
@@ -120,7 +120,6 @@ const Settings = () => {
 
   // Handle preferred communication update
   const handleCommunicationUpdate = async () => {
-
     const userId = localStorage.getItem("UserID");
     setIsLoadingCommunication(true);
 
@@ -157,13 +156,59 @@ const Settings = () => {
   };
 
   // Handle next of kin and marital status update
-  const handleDetailsUpdate = () => {
+  const handleDetailsUpdate = async () => {
+    const userId = localStorage.getItem("UserID");
     setIsLoadingDetails(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoadingDetails(false);
-      alert("Details updated successfully.");
-    }, 2000);
+
+    let signinresponse = await fetch(`${API_URL}/members/details/${userId}`, {
+      method: "put",
+      body: JSON.stringify({
+        address: nok.address,
+        city: "Harare",
+        nxt_of_kin: nok.name,
+        nok_relationship: nok.relationship,
+        nok_phone: nok.phone,
+        sponame: nok.spouseName,
+        marital_status: nok.marital,
+        spophone: nok.spousePhone,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    let resJson = await signinresponse.json();
+
+    console.log(resJson);
+    setIsLoadingDetails(false);
+
+    if (resJson.message == "Member details updated successfully") {
+      localStorage.setItem("UserAddress", nok.address);
+      localStorage.setItem("UserNok", nok.name);
+      localStorage.setItem("UserNokPhone", nok.phone);
+      localStorage.setItem("UserNokRel", nok.relationship);
+      localStorage.setItem("UserMarital", nok.marital);
+      localStorage.setItem("UserSpouse", nok.spouseName);
+      localStorage.setItem("UserSpousePhone", nok.spousePhone);
+      Swal.fire({
+        text: "Member details updated successfully",
+        icon: "success",
+      });
+      setNok({
+        address: "",
+        name: "",
+        phone: "",
+        relationship: "",
+        marital: "",
+        spouseName: "",
+        spousePhone: "",
+      });
+    } else {
+      Swal.fire({
+        text: "Member details did not update successfully. Contact sysem admin",
+        icon: "error",
+      });
+    }
   };
 
   // Handle profile image upload
@@ -206,7 +251,7 @@ const Settings = () => {
 
         if (response.data.result.message == "Member updated successfully") {
           const setnewimg = async () => {
-           localStorage.setItem("UserImg", response.data.Filename);
+            localStorage.setItem("UserImg", response.data.Filename);
           };
           setnewimg();
           setFile("");
@@ -238,7 +283,10 @@ const Settings = () => {
         >
           {file ? (
             <>
-              <img src={URL.createObjectURL(file)} style={styles.profileImage} />
+              <img
+                src={URL.createObjectURL(file)}
+                style={styles.profileImage}
+              />
             </>
           ) : (
             <div style={styles.profileImagePlaceholder}>Profile Image</div>
@@ -356,7 +404,7 @@ const Settings = () => {
 
       {/* Next of Kin and Marital Status Section */}
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>Next of Kin & Marital Status</h2>
+        <h2 style={styles.sectionTitle}>Member Address, Next of Kin & Marital Status</h2>
         <input
           type="text"
           placeholder="Address"

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { API_URL } from "./config";
+import Swal from "sweetalert2";
 
 const Kids = () => {
   // State for managing kids data
   const [kids, setKids] = useState([]);
+  const [tableData, setTableData] = React.useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [formState, setFormState] = useState("New Member"); // "New Member" or "Update Member"
   const [currentKid, setCurrentKid] = useState({
@@ -17,6 +20,7 @@ const Kids = () => {
     yy: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Dummy data for kids (replace with actual API calls)
   const dummyKidsData = [
@@ -38,13 +42,30 @@ const Kids = () => {
     },
   ];
 
-  // Fetch kids data (replace with actual API call)
   useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setKids(dummyKidsData);
-      setIsLoading(false);
-    }, 1000);
+    const findFormData = async () => {
+      try {
+        setIsLoading(true);
+        const memberId = localStorage.getItem("UserID");
+        //alert(memberId);
+        //const asynctoken = localStorage.getItem("Tkn");
+
+        let res = await fetch(`${API_URL}/children/parent/${memberId}`, {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        setIsLoading(false);
+        let responseJson = await res.json();
+        setTableData(responseJson);
+        console.log(responseJson);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    findFormData();
   }, []);
 
   // Open modal for adding or editing a kid
@@ -52,7 +73,7 @@ const Kids = () => {
     if (kid) {
       setFormState("Update Member");
       setCurrentKid({
-        id: kid.id,
+        id: kid.childID,
         name: kid.name,
         surname: kid.surname,
         dob: kid.dob,
@@ -80,7 +101,7 @@ const Kids = () => {
   };
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       !currentKid.name ||
       !currentKid.surname ||
@@ -90,40 +111,178 @@ const Kids = () => {
       !currentKid.relationship ||
       !currentKid.gender
     ) {
-      alert("Please fill in all fields.");
+      Swal.fire({
+        text: "Registration failed, Fill all the fields",
+        icon: "error",
+      });
       return;
     }
 
-    const dob = `${currentKid.yy}-${currentKid.mm}-${currentKid.dd}`;
-    const newKid = {
-      id: currentKid.id || String(kids.length + 1), // Generate ID if new
+    setIsSaving(true);
+    const dat = currentKid.yy + "-" + currentKid.mm + "-" + currentKid.dd;
+    const parID = localStorage.getItem("UserID");
+
+    const memberObj = {
+      parentID: parID,
       name: currentKid.name,
       surname: currentKid.surname,
-      dob,
+      dob: dat,
       relationship: currentKid.relationship,
       gender: currentKid.gender,
     };
-
-    setIsLoading(true);
-    setTimeout(() => {
-      if (formState === "New Member") {
-        setKids([...kids, newKid]);
+    let signinresponse = null;
+    try {
+      if (formState == "New Member") {
+        signinresponse = await fetch(`${API_URL}/children`, {
+          method: "post",
+          body: JSON.stringify(memberObj),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
       } else {
-        setKids(kids.map((kid) => (kid.id === newKid.id ? newKid : kid)));
+        signinresponse = await fetch(`${API_URL}/children/${currentKid.id}`, {
+          method: "put",
+          body: JSON.stringify(memberObj),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
       }
+    } catch (error) {
+      console.log(error)
+    }
+    
+
+    setIsSaving(true);
+    let resJson = await signinresponse.json();
+    console.log(resJson);
+
+    if (resJson.message == "Child record added successfully") {
       setModalVisible(false);
-      setIsLoading(false);
-    }, 1000);
+      setCurrentKid({
+        id: "",
+        name: "",
+        surname: "",
+        dob: "",
+        relationship: "",
+        gender: "",
+        dd: "",
+        mm: "",
+        yy: "",
+      });
+      Swal.fire({
+        text: "Member added succesfully",
+        icon: "success",
+      });
+      const memberId = localStorage.getItem("UserID");
+
+      //const asynctoken = localStorage.getItem("Tkn");
+
+      let res = await fetch(`${API_URL}/children/parent/${memberId}`, {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      let responseJson = await res.json();
+      setTableData(responseJson);
+      setFormState("New Member");
+      return;
+    } else if (resJson.message == "Child record updated successfully") {
+      setModalVisible(false);
+      setCurrentKid({
+        id: "",
+        name: "",
+        surname: "",
+        dob: "",
+        relationship: "",
+        gender: "",
+        dd: "",
+        mm: "",
+        yy: "",
+      });
+      Swal.fire({
+        text: "Member updated successfully",
+        icon: "success",
+      });
+      const memberId = localStorage.getItem("UserID");
+
+      //const asynctoken = await AsyncStorage.getItem("Tkn");
+
+      let res = await fetch(`${API_URL}/children/parent/${memberId}`, {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      let responseJson = await res.json();
+      setTableData(responseJson);
+      setFormState("New Member");
+      return;
+    } else {
+      Swal.fire({
+        text: "Saving failed, Try again or contact system admin",
+        icon: "error",
+      });
+    }
+
   };
 
   // Handle deletion of a kid
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this kid?")) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setKids(kids.filter((kid) => kid.id !== id));
-        setIsLoading(false);
-      }, 1000);
+      let signinresponse = await fetch(`${API_URL}/children/${id}`, {
+        method: "delete",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      let resJson = await signinresponse.json();
+  
+      console.log(resJson);
+  
+      if (resJson.message == "Child record deleted successfully") {
+        setModalVisible(false);
+        setCurrentKid({
+          id: "",
+          name: "",
+          surname: "",
+          dob: "",
+          relationship: "",
+          gender: "",
+          dd: "",
+          mm: "",
+          yy: "",
+        });
+        Swal.fire({
+          text: "Member record deleted successfully",
+          icon: "success",
+        });
+        const memberId = localStorage.getItem("UserID");
+  
+        //const asynctoken = await AsyncStorage.getItem("Tkn");
+  
+        let res = await fetch(`${API_URL}/children/parent/${memberId}`, {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        let responseJson = await res.json();
+        setTableData(responseJson);
+        setFormState("New Member");
+        return;
+      } else {
+        Swal.fire({
+          text: "Deleting failed, Try again or contact system admin",
+          icon: "error",
+        });
+      }
     }
   };
 
@@ -142,27 +301,20 @@ const Kids = () => {
           <tr>
             <th>Full Name</th>
             <th>Gender</th>
-            <th>Actions</th>
+            <th style={{ textAlign :'center' }}>Edit</th>
+            <th style={{ textAlign :'center' }}>Remove</th>
           </tr>
         </thead>
         <tbody>
-          {kids.map((kid) => (
-            <tr key={kid.id}>
+          {tableData.map((kid) => (
+            <tr key={kid.childID}>
               <td>{`${kid.name} ${kid.surname}`}</td>
               <td>{kid.gender === "M" ? "Male" : "Female"}</td>
-              <td>
-                <button
-                  style={styles.editButton}
-                  onClick={() => openModal(kid)}
-                >
-                  Edit
-                </button>
-                <button
-                  style={styles.deleteButton}
-                  onClick={() => handleDelete(kid.id)}
-                >
-                  Delete
-                </button>
+              <td style={{ textAlign :'center' }}>
+                <i onClick={() => openModal(kid)} className="material-icons" style={{ fontSize: '1.5rem' }}>edit</i>
+              </td>
+              <td style={{ textAlign :'center' }}>
+                <i onClick={() => handleDelete(kid.childID)} className="material-icons" style={{ fontSize: '1.5rem' }}>clear</i>
               </td>
             </tr>
           ))}
@@ -173,48 +325,52 @@ const Kids = () => {
       {modalVisible && (
         <div style={styles.modalOverlay}>
           <div style={styles.modal}>
-            <h2>{formState}</h2>
+            <h5>{formState}</h5>
             <div style={styles.formGroup}>
-              <label>First Name</label>
+              <label style={{fontSize: '12px'}}>First Name</label>
               <input
                 type="text"
                 value={currentKid.name}
                 onChange={(e) =>
                   setCurrentKid({ ...currentKid, name: e.target.value })
                 }
+                style={styles.input}
               />
             </div>
             <div style={styles.formGroup}>
-              <label>Surname</label>
+              <label style={{fontSize: '12px'}}>Surname</label>
               <input
                 type="text"
                 value={currentKid.surname}
                 onChange={(e) =>
                   setCurrentKid({ ...currentKid, surname: e.target.value })
                 }
+                style={styles.input}
               />
             </div>
             <div style={styles.formGroup}>
-              <label>Gender</label>
+              <label style={{fontSize: '12px'}}>Gender</label>
               <select
                 value={currentKid.gender}
                 onChange={(e) =>
                   setCurrentKid({ ...currentKid, gender: e.target.value })
                 }
+                style={styles.input}
               >
-                <option value="">Select Gender</option>
+                <option value=""></option>
                 <option value="M">Male</option>
                 <option value="F">Female</option>
               </select>
             </div>
             <div style={styles.formGroup}>
-              <label>Date of Birth</label>
+              <label style={{fontSize: '12px'}}>Date of Birth</label>
               <div style={styles.dateInputs}>
                 <select
                   value={currentKid.dd}
                   onChange={(e) =>
                     setCurrentKid({ ...currentKid, dd: e.target.value })
                   }
+                  style={styles.input}
                 >
                   <option value="">Day</option>
                   {Array.from({ length: 31 }, (_, i) => (
@@ -228,6 +384,7 @@ const Kids = () => {
                   onChange={(e) =>
                     setCurrentKid({ ...currentKid, mm: e.target.value })
                   }
+                  style={styles.input}
                 >
                   <option value="">Month</option>
                   {Array.from({ length: 12 }, (_, i) => (
@@ -241,6 +398,7 @@ const Kids = () => {
                   onChange={(e) =>
                     setCurrentKid({ ...currentKid, yy: e.target.value })
                   }
+                  style={styles.input}
                 >
                   <option value="">Year</option>
                   {Array.from({ length: 25 }, (_, i) => (
@@ -252,14 +410,15 @@ const Kids = () => {
               </div>
             </div>
             <div style={styles.formGroup}>
-              <label>Relationship</label>
+              <label style={{fontSize: '12px'}}>Relationship</label>
               <select
                 value={currentKid.relationship}
                 onChange={(e) =>
                   setCurrentKid({ ...currentKid, relationship: e.target.value })
                 }
+                style={styles.input}
               >
-                <option value="">Select Relationship</option>
+                <option value=""></option>
                 <option value="Son">Son</option>
                 <option value="Daughter">Daughter</option>
                 <option value="GrandSon">GrandSon</option>
@@ -278,9 +437,9 @@ const Kids = () => {
               <button
                 style={styles.saveButton}
                 onClick={handleSubmit}
-                disabled={isLoading}
+                disabled={isSaving}
               >
-                {isLoading ? "Saving..." : "Save"}
+                {isSaving ? "Saving..." : "Save"}
               </button>
             </div>
           </div>
@@ -383,6 +542,13 @@ const styles = {
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
+  },
+  input: {
+    width: "100%",
+    padding: "10px",
+    marginBottom: "1px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
   },
 };
 

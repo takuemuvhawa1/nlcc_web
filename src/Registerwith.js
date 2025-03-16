@@ -56,6 +56,7 @@ const Registerwith = () => {
                                                 <div className="">
                                                     <p></p>
                                                     <a className="small" style={{ color: 'black' }} href="/">Already registered? Login!</a>
+                                                   
                                                 </div>
                                             </div>
                                             <hr />
