@@ -1,9 +1,9 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { API_URL } from "./config";
 import Swal from 'sweetalert2';
 
-const Notifications = () => {
+const Notifications = ({ searchQuery }) => {
     // Dummy data for ministries
     const [notificationData, setNotificationData] = useState([]);
 
@@ -21,7 +21,6 @@ const Notifications = () => {
 
                 let responseJson = await res.json();
                 setNotificationData(responseJson);
-                // setFilteredData(responseJson);
             } catch (error) {
                 Swal.fire({
                     text: "Failed to load notifications. Check your internet connection!",
@@ -34,13 +33,24 @@ const Notifications = () => {
 
     }, []);
 
+    // Filtered data calculation
+    const filteredData = useMemo(() => {
+        if (!searchQuery) return notificationData;
+
+        const query = searchQuery.toLowerCase();
+        return notificationData.filter(notification =>
+            notification.header.toLowerCase().includes(query) ||
+            notification.content.toLowerCase().includes(query)
+        );
+    }, [notificationData, searchQuery]);
+
     return (
         <div>
             <h4 style={{ textAlign: 'center', fontSize: '17px', color: '#1a6363' }}>
                 Notifications
             </h4>
-            <div className="block" style={{ textAlign: 'left', justifyContent: 'left',width: '100%' }}>
-                {notificationData.map((notification) => (
+            <div className="block" style={{ textAlign: 'left', justifyContent: 'left', width: '100%' }}>
+                {filteredData.map((notification) => (
                     <div
                         key={notification.id}
                         style={{
@@ -59,7 +69,7 @@ const Notifications = () => {
                             <strong>Notice:</strong> {notification.content}
                         </p>
                         <p style={{ margin: '5px 0', fontSize: '14px', color: '#555' }}>
-                        Sent On: {notification.date.slice(0, 10)} {notification.time.slice(0, 5)}
+                            Sent On: {notification.date.slice(0, 10)} {notification.time.slice(0, 5)}
                         </p>
                     </div>
                 ))}

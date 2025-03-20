@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import About from "./About";
 import Calender from "./Calender";
 import Cellgroups from "./Cellgroups";
-import Footer from "./Footer";
 import Ministries from "./Ministries";
 import PrayerReq from "./PrayerReq";
 import Notifications from "./Notifications";
 
 const Blank = () => {
     const [activeComponent, setActiveComponent] = useState("Refresh");
+    const [searchQuery, setSearchQuery] = useState('');
 
     const handleButtonClick = (component) => {
         setActiveComponent(component);
@@ -38,7 +38,7 @@ const Blank = () => {
                         <div id="page-home" className="active mt-4">
                             <div className="col-lg-6">
                                 <form className="nosubmit">
-                                    <input className="nosubmit form-control" type="search" placeholder="Search..." />
+                                    <input className="nosubmit form-control" type="search" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
                                 </form>
                             </div>
                             <div className="block mt-4">
@@ -57,6 +57,7 @@ const Blank = () => {
 
                         <div
                             id="page-account"
+                            className="active"
                             style={{
                                 justifyContent: 'center',
                                 alignItems: 'center',
@@ -71,28 +72,28 @@ const Blank = () => {
                                 </div>
                             )}
                             {activeComponent === "Ministries" && (
-                                <div style={{ width: '100%', alignSelf: 'center'  }}>
-                                    <Ministries />
+                                <div style={{ width: '100%', alignSelf: 'center' }}>
+                                    <Ministries  searchQuery={searchQuery} />
                                 </div>
                             )}
                             {activeComponent === "Calender" && (
-                                <div style={{ width: '100%' }}>
-                                    <Calender />
+                                <div style={{ width: '100%'}}>
+                                    <Calender searchQuery={searchQuery} />
                                 </div>
                             )}
                             {activeComponent === "Cellgroups" && (
-                                <div style={{ width: '100%' }}>
-                                    <Cellgroups />
+                                <div style={{ width: '100%'}}>
+                                    <Cellgroups searchQuery={searchQuery} />
                                 </div>
                             )}
                             {activeComponent === "PrayerReq" && (
-                                <div style={{ width: '100%' }}>
-                                    <PrayerReq />
+                                <div style={{ width: '100%'}}>
+                                    <PrayerReq searchQuery={searchQuery} />
                                 </div>
                             )}
                             {activeComponent === "Refresh" && (
-                                <div style={{ width: '100%' }}>
-                                    <Notifications />
+                                <div style={{ width: '100%'}}>
+                                    <Notifications searchQuery={searchQuery} />
                                 </div>
                             )}
                         </div>

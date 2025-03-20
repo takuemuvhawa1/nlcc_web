@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import Swal from 'sweetalert2';
 
 const Cellgroup = () => {
-    // Dummy data for a single cell group
     const [cellgroup, setCellgroup] = useState({
         id: "",
         name: "",
         description: "",
         leaders: [],
-        joined: false, // Set to false initially (not joined)
-        dateJoined: null, // Will be set when joined
+        joined: false,
+        dateJoined: null,
     });
 
     useEffect(() => {
@@ -38,7 +37,7 @@ const Cellgroup = () => {
         };
 
         findFormData();
-      
+
     }, []);
 
     const handleJoin = () => {
@@ -68,7 +67,7 @@ const Cellgroup = () => {
     };
 
     return (
-        <div style={{paddingInline: '10px'}}>
+        <div style={{ paddingInline: '10px' }}>
             <h4 style={{ textAlign: 'center', fontSize: '17px', color: '#1a6363' }}>
                 Cell Group Details
             </h4>
@@ -95,7 +94,7 @@ const Cellgroup = () => {
                     {/* Leader: {cellgroup.leader} */}
                     Contact: 0789700021
                 </p>
-                    
+
                 {cellgroup.joined ? (
                     <>
                         <p style={{ margin: '5px 0', fontSize: '14px', color: '#555' }}>

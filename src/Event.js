@@ -9,12 +9,11 @@ const Event = () => {
         title: "Building a Stronger Community",
         startDate: "2023-11-01",
         endDate: "2023-11-03",
-        joined: false, // Set to false initially (not joined)
-        dateJoined: null, // Will be set when joined
+        joined: false, 
+        dateJoined: null, 
     });
 
     const handleJoin = () => {
-        // Simulate joining the event
         Swal.fire({
             text: "Request to join sent!",
             icon: "success"
@@ -22,12 +21,11 @@ const Event = () => {
         setEvent(prevEvent => ({
             ...prevEvent,
             joined: true,
-            dateJoined: new Date().toLocaleDateString(), // Set the current date as the join date
+            dateJoined: new Date().toLocaleDateString(), 
         }));
     };
 
     const handleLeave = () => {
-        // Simulate leaving the event
         Swal.fire({
             text: "Request to leave sent!",
             icon: "success"
@@ -35,7 +33,7 @@ const Event = () => {
         setEvent(prevEvent => ({
             ...prevEvent,
             joined: false,
-            dateJoined: null, // Reset the join date
+            dateJoined: null, 
         }));
     };
 

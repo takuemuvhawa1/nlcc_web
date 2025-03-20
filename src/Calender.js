@@ -1,15 +1,13 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { API_URL } from "./config";
 import Swal from 'sweetalert2';
 
-const Calender = () => {
-    // Dummy data for calendar events
+const Calender = ({ searchQuery }) => {
     const [calendarEvents, setCalendarEvents] = useState([]);
     useEffect(() => {
         const asyncFetch = async () => {
             try {
-                // const userId = await localStorage.getItem("UserID");
 
                 let res = await fetch(`${API_URL}/events-tasks`, {
                     method: "get",
@@ -20,7 +18,6 @@ const Calender = () => {
 
                 let responseJson = await res.json();
                 setCalendarEvents(responseJson);
-                // setFilteredData(responseJson);
             } catch (error) {
                 console.error('Error deleting child:', error);
                 Swal.fire({
@@ -34,13 +31,24 @@ const Calender = () => {
 
     }, []);
 
+    // Filtered data calculation
+        const filteredData = useMemo(() => {
+            if (!searchQuery) return calendarEvents;
+    
+            const query = searchQuery.toLowerCase();
+            return calendarEvents.filter(event =>
+                event.type.toLowerCase().includes(query) ||
+                event.type.toLowerCase().includes(query)
+            );
+        }, [calendarEvents, searchQuery]);
+
     return (
         <div>
             <h4 style={{ textAlign: 'center', fontSize: '17px', color: '#1a6363' }}>
                 View events and church services part of our calendar
             </h4>
             <div className="block">
-                {calendarEvents.map((event) => (
+                {filteredData.map((event) => (
                     <div
                         key={event.id}
                         style={{

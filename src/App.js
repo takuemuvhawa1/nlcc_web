@@ -19,7 +19,11 @@ import Registerwith from './Registerwith';
 import ForgotPassword from './ForgotPassword';
 import EmailRegister from './EmailRegister';
 import PhoneRegister from './PhoneRegister';
+import SetPassword from './SetPassword';
 import ResetPassword from './ResetPassword';
+import About from './About';
+import PwaInstaller from './PwaInstaller';
+
 
 function App() {
 
@@ -29,11 +33,20 @@ function App() {
                 <Routes>
                     <Route path='/' element={<Login />}></Route>
                     <Route path='/registerselect' element={<Registerwith />}></Route>
-                    <Route path='/forgotpassword' element={<ForgotPassword />}></Route>
+                    <Route path='/SetPassword' element={<SetPassword />}></Route>
                     <Route path='/resetpassword' element={<ResetPassword />}></Route>
+                    <Route path='/forgotpassword' element={<ForgotPassword />}></Route>
                     <Route path='/registeremail' element={<EmailRegister />}></Route>
                     <Route path='/registerphone' element={<PhoneRegister />}></Route>
                     <Route path='/register' element={<Register />}></Route>
+                    <Route path='/install' element={<PwaInstaller />}></Route>
+                    <Route path='/about' element={
+                        <>
+                            <Topnav />
+                            <About />
+                            <Footer />
+                        </>
+                    }></Route>
                     <Route path='/home' element={
                         <>
                             <Topnav />

@@ -242,6 +242,7 @@ const styles = {
   detailsContainer: {
     width: "100%",
     maxWidth: "500px",
+    marginBottom: "115px"
   },
   detailItem: {
     display: "flex",

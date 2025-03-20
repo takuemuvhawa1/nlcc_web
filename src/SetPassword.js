@@ -7,7 +7,7 @@ import { BarLoader, ClipLoader } from "react-spinners";
 const SetPassword = () => {
   const navigate = useNavigate();
   const [nam, setNam] = useState("");
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(""); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cnpassword, setCnpassword] = useState("");

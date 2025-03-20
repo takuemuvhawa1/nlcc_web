@@ -1,10 +1,10 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "./config";
 import Swal from 'sweetalert2';
 
-const Cellgroups = () => {
+const Cellgroups = ({ searchQuery }) => {
 
     const [cellGroupsData, setCellGroupsData] = useState([]);
     const [hoveredCard, setHoveredCard] = useState(null);
@@ -21,9 +21,9 @@ const Cellgroups = () => {
     useEffect(() => {
         const asyncFetch = async () => {
             try {
-                // const userId = await localStorage.getItem("UserID");
+                const userId = await localStorage.getItem("UserID");
 
-                let res = await fetch(`${API_URL}/smallgroups/small-groups/${3}`, {
+                let res = await fetch(`${API_URL}/smallgroups/small-groups/${userId}`, {
                     method: "get",
                     headers: {
                         "Content-Type": "application/json",
@@ -46,6 +46,17 @@ const Cellgroups = () => {
 
     }, []);
 
+    // Filtered data calculation
+    const filteredData = useMemo(() => {
+        if (!searchQuery) return cellGroupsData;
+
+        const query = searchQuery.toLowerCase();
+        return cellGroupsData.filter(group =>
+            group.name.toLowerCase().includes(query) ||
+            group.location.toLowerCase().includes(query)
+        );
+    }, [cellGroupsData, searchQuery]);
+
     const handleCardClick = (cellObj) => {
         localStorage.setItem("SelectedGroup", JSON.stringify(cellObj));
         navigate(`/cellgroup`);
@@ -58,7 +69,7 @@ const Cellgroups = () => {
                 Be part of a Home Group
             </h4>
             <div className="block">
-                {cellGroupsData.map((group) => (
+                {filteredData.map((group) => (
                     <div
                         key={group.id}
                         style={{
